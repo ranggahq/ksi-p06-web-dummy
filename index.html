@@ -1,14 +1,239 @@
 <!doctype html>
-<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>24781052 · Web Dummy LLM · P06 KSI</title>
-<style>body{font-family:system-ui,sans-serif;max-width:720px;margin:24px auto;padding:0 16px;line-height:1.5;color:#0f172a}a{color:#1d4ed8}.d{background:#fde68a;padding:8px 12px;border-radius:8px}</style></head>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>24781052 · Web Dummy LLM · P06 Keamanan Sistem Informasi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f8fafc;
+    --fg: #0f172a;
+    --muted: #64748b;
+    --card: #ffffff;
+    --line: #e2e8f0;
+    --primary: #2563eb;
+    --primary-hover: #1d4ed8;
+    --danger: #dc2626;
+    --success: #15803d;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--fg);
+    line-height: 1.6;
+    padding: 32px 16px;
+  }
+  .container {
+    max-width: 840px;
+    margin: 0 auto;
+  }
+  .banner-dummy {
+    background: #fef3c7;
+    border: 1px solid #fde68a;
+    color: #92400e;
+    padding: 12px 16px;
+    border-radius: 12px;
+    margin-bottom: 24px;
+    font-size: .92rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  header {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+  }
+  .tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1d4ed8;
+    font-weight: 700;
+    font-size: .8rem;
+    padding: 4px 12px;
+    border-radius: 999px;
+    margin-bottom: 12px;
+    letter-spacing: .03em;
+  }
+  h1 {
+    font-size: 1.75rem;
+    font-weight: 800;
+    margin: 0 0 8px;
+    color: #1e293b;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: .95rem;
+    margin: 0;
+  }
+  .grid-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+  }
+  @media (max-width: 680px) {
+    .grid-cards { grid-template-columns: 1fr; }
+  }
+  .portal-card {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    box-shadow: 0 4px 6px -1px rgba(0,0,0,0.04);
+    transition: transform .2s ease, box-shadow .2s ease, border-color .2s ease;
+  }
+  .portal-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 15px -3px rgba(0,0,0,0.08);
+  }
+  .portal-card.rentan { border-top: 5px solid var(--danger); }
+  .portal-card.aman { border-top: 5px solid var(--success); }
+  .portal-badge {
+    align-self: flex-start;
+    padding: 4px 12px;
+    border-radius: 999px;
+    font-size: .78rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .05em;
+    margin-bottom: 12px;
+  }
+  .portal-badge.rentan { background: #fee2e2; color: #b91c1c; }
+  .portal-badge.aman { background: #dcfce7; color: #15803d; }
+  .portal-title {
+    font-size: 1.25rem;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: #1e293b;
+  }
+  .portal-desc {
+    color: var(--muted);
+    font-size: .92rem;
+    margin: 0 0 20px;
+    flex-grow: 1;
+  }
+  .portal-list {
+    margin: 0 0 20px;
+    padding-left: 20px;
+    font-size: .88rem;
+    color: #334155;
+  }
+  .portal-list li { margin-bottom: 6px; }
+  .btn-portal {
+    display: inline-block;
+    text-align: center;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 600;
+    font-size: .95rem;
+    text-decoration: none;
+    color: #fff;
+    transition: opacity .15s ease, background .15s ease;
+  }
+  .btn-portal.rentan { background: var(--danger); }
+  .btn-portal.rentan:hover { background: #b91c1c; }
+  .btn-portal.aman { background: var(--success); }
+  .btn-portal.aman:hover { background: #166534; }
+  .guide-box {
+    background: #fff;
+    border: 1px solid var(--line);
+    border-radius: 16px;
+    padding: 22px 26px;
+    font-size: .92rem;
+  }
+  .guide-box h2 {
+    font-size: 1.15rem;
+    margin: 0 0 12px;
+    color: #1e293b;
+  }
+  .guide-box ol {
+    margin: 0;
+    padding-left: 20px;
+    color: #334155;
+    line-height: 1.7;
+  }
+</style>
+</head>
 <body>
-<p class="d"><strong>DUMMY PRAKTIKUM – data sintetis.</strong> Jangan masukkan data pribadi.</p>
-<h1>Web Dummy LLM · Chatbot Kantin</h1>
-<p>Rangga Hazirathul Qudsiah · NPM 24781052 · Politeknik Negeri Lampung · Keamanan Sistem Informasi (PMI 1522), P06 Risiko AI/LLM dan Prompt Injection · Kasus LIVE-1 (prompt injection langsung).</p>
-<ul>
-  <li><a href="24781052-kantin-voucher-rentan.html">Versi RENTAN</a>: keluaran model dipercaya penuh, aksi langsung dijalankan.</li>
-  <li><a href="24781052-kantin-voucher-aman.html">Versi AMAN</a>: kontrol di luar model (pemisahan peran, allowlist tool, validasi keluaran).</li>
-</ul>
-<p>Kedua halaman memanggil LLM asli memakai API key milik pengguna sendiri (diisi di kolom, tidak ada di kode).</p>
-</body></html>
+<div class="container">
+  <div class="banner-dummy">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+    <div><strong>DUMMY PRAKTIKUM – DATA SINTETIS.</strong> Seluruh data menu &amp; voucher bersifat sintetis. Pengujian ini tidak menyimpan data pribadi ke server mana pun.</div>
+  </div>
+
+  <header>
+    <span class="tag">P06 · PRAKTIKUM KEAMANAN SISTEM INFORMASI</span>
+    <h1>Web Dummy LLM · Chatbot Kantin Koperasi</h1>
+    <p class="meta">
+      <strong>Rangga Hazirathul Qudsiah</strong> · NPM <strong>24781052</strong><br>
+      Politeknik Negeri Lampung · PMI 1522 Keamanan Sistem Informasi<br>
+      Topik: <em>Risiko Keamanan AI/LLM &amp; Mitigasi Prompt Injection (Kasus LIVE-1)</em>
+    </p>
+  </header>
+
+  <div class="grid-cards">
+    <!-- Versi Rentan -->
+    <div class="portal-card rentan">
+      <div>
+        <span class="portal-badge rentan">Kondisi Awal</span>
+        <h2 class="portal-title">Versi RENTAN</h2>
+        <p class="portal-desc">Sistem belum menerapkan kontrol keamanan di luar model LLM. Masukan pengguna digabungkan langsung dengan instruksi sistem tanpa validasi.</p>
+        <ul class="portal-list">
+          <li>Instruksi sistem &amp; masukan pengguna bercampur</li>
+          <li>Keluaran model dipercaya 100% tanpa inspeksi</li>
+          <li>Aksi <code>buat_voucher</code> dieksekusi langsung tanpa izin kasir</li>
+          <li><strong>Hasil Uji:</strong> Terindikasi Pelanggaran Kebijakan (Jebol)</li>
+        </ul>
+      </div>
+      <a href="24781052-kantin-voucher-rentan.html" class="btn-portal rentan">Buka Versi RENTAN &rarr;</a>
+    </div>
+
+    <!-- Versi Aman -->
+    <div class="portal-card aman">
+      <div>
+        <span class="portal-badge aman">Kondisi Terproteksi</span>
+        <h2 class="portal-title">Versi AMAN</h2>
+        <p class="portal-desc">Menerapkan prinsip <em>Defense-in-Depth</em> di mana seluruh kontrol keamanan ditegakkan secara ketat oleh kode aplikasi di luar model LLM.</p>
+        <ul class="portal-list">
+          <li>Pemisahan kanal peran (System Instruction terpisah)</li>
+          <li>Isolasi masukan pengguna sebagai data tak tepercaya</li>
+          <li>Allowlist tool ketat (hanya <code>lihat_menu</code> diizinkan)</li>
+          <li>Validasi keluaran: menyaring voucher ilegal &amp; kata terlarang</li>
+          <li><strong>Hasil Uji:</strong> Kebijakan Ditegakkan (Aman)</li>
+        </ul>
+      </div>
+      <a href="24781052-kantin-voucher-aman.html" class="btn-portal aman">Buka Versi AMAN &rarr;</a>
+    </div>
+  </div>
+
+  <div class="guide-box">
+    <h2>📋 Panduan Pengujian Praktikum (Untuk Penilai / Penguji)</h2>
+    <ol>
+      <li>Buka masing-masing versi (<strong>Rentan</strong> lalu <strong>Aman</strong>).</li>
+      <li>Masukkan API Key Google AI Studio milik sendiri (opsi model hemat: <code>gemini-1.5-flash</code>), <em>atau</em> centang <strong>Mode Simulasi / Mock Tester</strong> jika ingin menguji secara offline tanpa API Key / tanpa kuota token.</li>
+      <li>Klik tombol <strong>"Isi payload serangan"</strong> untuk memuat payload prompt injection standar kasus LIVE-1.</li>
+      <li>Klik tombol <strong>"Jalankan payload &times;3 &amp; catat ke log"</strong>.</li>
+      <li>Perhatikan perbedaannya:
+        <ul>
+          <li>Pada <strong>Versi Rentan</strong>: Sistem terindikasi pelanggaran (merah) karena voucher diskon berhasil diterbitkan.</li>
+          <li>Pada <strong>Versi Aman</strong>: Sistem menahan serangan (hijau), tool terlarang ditolak oleh kode aplikasi, dan keluaran disanitasi.</li>
+        </ul>
+      </li>
+      <li>Klik <strong>"Ekspor log"</strong> untuk mengunduh berkas laporan format JSON (<code>24781052-LIVE-1-rentan-log.json</code> dan <code>24781052-LIVE-1-aman-log.json</code>).</li>
+    </ol>
+  </div>
+</div>
+</body>
+</html>
