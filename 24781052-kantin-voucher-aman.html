@@ -242,18 +242,15 @@
       </div>
       <div>
         <div style="display:flex;justify-content:space-between;align-items:center;">
-          <label for="model" style="margin:0;">Nama model LLM</label>
-          <button id="btn-cek-model" type="button" class="alt small" title="Ambil daftar model yang aktif untuk API key Anda">🔍 Cek Model Akun Saya</button>
+          <label for="model" style="margin:0;">Nama model LLM (Text)</label>
+          <button id="btn-cek-model" type="button" class="alt small" title="Ambil daftar model teks aktif untuk API key Anda">🔍 Cek Model Teks Saya</button>
         </div>
-        <input id="model" list="daftar-model" value="gemini-2.5-flash" autocomplete="off" style="margin-top:6px;">
+        <input id="model" list="daftar-model" value="gemini-2.0-flash" autocomplete="off" style="margin-top:6px;">
         <datalist id="daftar-model">
-          <option value="gemini-2.5-flash">
-          <option value="gemini-2.5-flash-lite">
           <option value="gemini-2.0-flash">
           <option value="gemini-2.0-flash-lite">
-          <option value="gemini-1.5-flash-latest">
-          <option value="gemini-1.5-flash">
-          <option value="gemini-1.5-flash-8b">
+          <option value="gemini-2.5-flash">
+          <option value="gemini-2.5-flash-lite">
         </datalist>
       </div>
     </div>
@@ -263,7 +260,7 @@
         <strong>Mode Simulasi / Mock Tester</strong> (Centang bila ingin menguji tanpa API Key atau kuota token Google AI habis)
       </label>
     </div>
-    <p class="muted" style="margin-top:8px;">💡 Jika model pilihan Anda tidak aktif, klik tombol <strong>"🔍 Cek Model Akun Saya"</strong> untuk otomatis mendeteksi model yang tersedia di akun Google AI Studio Anda.</p>
+    <p class="muted" style="margin-top:8px;">💡 Pastikan menggunakan model teks (bukan audio/TTS). Klik tombol <strong>"🔍 Cek Model Teks Saya"</strong> untuk otomatis memilih model teks yang aktif di akun Anda.</p>
   </section>
 
   <section class="card" aria-labelledby="h-uji">
@@ -309,7 +306,36 @@ let terakhir = null;   // jejak run terakhir (keluaran mentah model + keputusan 
 function simpanKey(v) { try { sessionStorage.setItem("p06-key", v); } catch (e) { /* sandbox: abaikan */ } }
 function bacaKey() { try { return sessionStorage.getItem("p06-key") || ""; } catch (e) { return ""; } }
 
-// ---- Ambil daftar model aktif langsung dari akun Google pengguna ----
+// Helper untuk memastikan model benar-benar model teks (BUKAN TTS / AUDIO / EMBEDDING / IMAGEN)
+function adalahModelTeks(nama) {
+  const low = String(nama || "").toLowerCase();
+  const dilarang = ["tts", "audio", "embed", "imagen", "vision-preview", "realtime", "live"];
+  for (let i = 0; i < dilarang.length; i++) {
+    if (low.indexOf(dilarang[i]) !== -1) return false;
+  }
+  return true;
+}
+
+function pilihModelTeksTerbaik(daftar) {
+  const prioritas = [
+    "gemini-2.0-flash",
+    "gemini-2.0-flash-lite",
+    "gemini-2.5-flash",
+    "gemini-2.5-flash-lite",
+    "gemini-1.5-flash",
+    "gemini-1.5-flash-8b",
+    "gemini-pro"
+  ];
+  for (let i = 0; i < prioritas.length; i++) {
+    const match = daftar.find(function(m) { return m.toLowerCase() === prioritas[i]; });
+    if (match) return match;
+  }
+  const flash = daftar.find(function(m) { return m.toLowerCase().indexOf("flash") !== -1 && adalahModelTeks(m); });
+  if (flash) return flash;
+  return daftar.find(adalahModelTeks) || daftar[0] || "gemini-2.0-flash";
+}
+
+// ---- Ambil daftar model teks aktif langsung dari akun Google pengguna ----
 async function muatDaftarModel(otomatis) {
   const key = (el("key").value || bacaKey()).trim();
   if (!key) {
@@ -317,7 +343,7 @@ async function muatDaftarModel(otomatis) {
     return [];
   }
   try {
-    setStatus("Memeriksa model yang aktif di akun Google Anda…");
+    setStatus("Memeriksa model teks aktif di akun Google Anda…");
     const res = await fetch("https://generativelanguage.googleapis.com/v1beta/models?key=" + encodeURIComponent(key));
     if (!res.ok) {
       if (!otomatis) setStatus("Gagal mengambil model dari Google (Status " + res.status + "). Periksa keaktifan API key Anda.", "bad");
@@ -325,7 +351,11 @@ async function muatDaftarModel(otomatis) {
     }
     const data = await res.json();
     const modelAktif = (data.models || [])
-      .filter(function (m) { return m.supportedGenerationMethods && m.supportedGenerationMethods.indexOf("generateContent") !== -1; })
+      .filter(function (m) {
+        if (!m.supportedGenerationMethods || m.supportedGenerationMethods.indexOf("generateContent") === -1) return false;
+        const nama = String(m.name).replace(/^models\//, "");
+        return adalahModelTeks(nama);
+      })
       .map(function (m) { return String(m.name).replace(/^models\//, ""); });
 
     if (modelAktif.length > 0) {
@@ -337,13 +367,10 @@ async function muatDaftarModel(otomatis) {
         dl.appendChild(opt);
       });
       const current = el("model").value.trim();
-      if (modelAktif.indexOf(current) === -1) {
-        const pengganti = modelAktif.find(function(m) { return m.indexOf("flash") !== -1 && m.indexOf("exp") === -1; }) ||
-                          modelAktif.find(function(m) { return m.indexOf("flash") !== -1; }) ||
-                          modelAktif[0];
-        el("model").value = pengganti;
+      if (!adalahModelTeks(current) || modelAktif.indexOf(current) === -1) {
+        el("model").value = pilihModelTeksTerbaik(modelAktif);
       }
-      setStatus("Model aktif untuk API key Anda berhasil dimuat (" + modelAktif.length + " model). Terpilih: " + el("model").value, "ok");
+      setStatus("Model teks aktif berhasil dimuat (" + modelAktif.length + " model). Terpilih: " + el("model").value, "ok");
       return modelAktif;
     }
   } catch (err) {
@@ -372,7 +399,13 @@ async function llmAsli(prompt, system) {
   if (!key) {
     throw new Error("API key belum diisi. Masukkan API key Google AI Studio Anda, atau centang 'Mode Simulasi' di atas.");
   }
-  let namaModel = (el("model").value || "gemini-2.5-flash").trim();
+  let namaModel = (el("model").value || "gemini-2.0-flash").trim();
+
+  // Pastikan tidak menggunakan model audio/tts
+  if (!adalahModelTeks(namaModel)) {
+    namaModel = "gemini-2.0-flash";
+    el("model").value = namaModel;
+  }
   simpanKey(key);
   LOG.model = namaModel;
 
@@ -380,7 +413,7 @@ async function llmAsli(prompt, system) {
     contents: [{ role: "user", parts: [{ text: prompt }] }],
     generationConfig: {
       temperature: 0.3,
-      maxOutputTokens: 250 // hemat kuota token agar tidak cepat habis
+      maxOutputTokens: 250 // hemat kuota token
     }
   };
   if (system) body.systemInstruction = { parts: [{ text: system }] };
@@ -403,12 +436,12 @@ async function llmAsli(prompt, system) {
 
     if (res && res.ok) break;
 
-    // Tangani jika model 404 (tidak tersedia di akun Google ini): Deteksi otomatis model yang aktif
-    if (res && res.status === 404) {
+    // Tangani jika salah modalitas 400 (audio/tts) atau 404: alihkan ke model teks murni
+    if (res && (res.status === 404 || (res.status === 400 && String(data.error && data.error.message).indexOf("response modalities") !== -1))) {
       const list = await muatDaftarModel(true);
-      const alternatif = list.find(function(m) { return m.indexOf("flash") !== -1 && m !== namaModel; }) || (list.length > 0 && list[0]);
+      const alternatif = pilihModelTeksTerbaik(list.filter(function(m) { return m !== namaModel && adalahModelTeks(m); }));
       if (alternatif && alternatif !== namaModel) {
-        setStatus("Model '" + namaModel + "' tidak aktif (404). Mengalihkan otomatis ke '" + alternatif + "'…", "muted");
+        setStatus("Model '" + namaModel + "' tidak cocok untuk teks. Mengalihkan ke '" + alternatif + "'…", "muted");
         namaModel = alternatif;
         el("model").value = alternatif;
         LOG.model = alternatif;
@@ -428,7 +461,7 @@ async function llmAsli(prompt, system) {
   if (!res || !res.ok) {
     let msg = (data && data.error && data.error.message) || (res ? res.statusText : "Koneksi gagal");
     if (res && res.status === 404) {
-      msg = "Model '" + namaModel + "' tidak aktif di akun Google AI Studio Anda. Klik tombol '🔍 Cek Model Akun Saya' untuk melihat model yang tersedia.";
+      msg = "Model '" + namaModel + "' tidak aktif di akun Google AI Studio Anda. Klik tombol '🔍 Cek Model Teks Saya'.";
     } else if (res && res.status === 429) {
       msg = "Batas kuota/rate limit Google AI habis (429: Too Many Requests). Saran: tunggu 1 menit, atau centang 'Mode Simulasi' untuk menguji langsung.";
     }
